@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">Admin</string>
-	<string name="title_activity_driver">DriverActivity</string>
-	<string name="title_activity_passenger">PassengerActivity</string>
+    <string name="app_name">Admin</string>
+    <string name="title_activity_driver">DriverActivity</string>
+    <string name="title_activity_passenger">PassengerActivity</string>
 </resources>

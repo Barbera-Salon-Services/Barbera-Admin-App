@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RealtimeTaxiAndroidDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/RealtimeTaxiAndroidDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/RealtimeTaxiAndroidDemo.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/RealtimeTaxiAndroidDemo.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/RealTimeLocation.iml" filepath="$PROJECT_DIR$/.idea/modules/RealTimeLocation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/RealTimeLocation.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/RealTimeLocation.app.iml" />
     </modules>
   </component>
 </project>
