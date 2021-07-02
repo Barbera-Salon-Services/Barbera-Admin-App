@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,11 +30,12 @@ public class EditService extends AppCompatActivity {
     private EditText discount;
     private EditText gender;
     private CheckBox dod_true,dod_false;
+    private CheckBox trend_true,trend_false;
     private EditText type;
     private EditText name;
     private TextView nameT;
     private Button save;
-    private String name1,id;
+    private String name1,id,token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,11 @@ public class EditService extends AppCompatActivity {
         save=findViewById(R.id.save_service);
         nameT=findViewById(R.id.nameT);
         name=findViewById(R.id.edit_name);
+        trend_false=findViewById(R.id.trending_false);
+        trend_true=findViewById(R.id.trending_true);
 
+        SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
+        token=preferences.getString("token","no");
         Intent intent=getIntent();
         String add=intent.getStringExtra("add");
 
@@ -67,6 +73,7 @@ public class EditService extends AppCompatActivity {
             String type1=intent.getStringExtra("type");
             String discount1=intent.getStringExtra("discount");
             boolean dod1=intent.getBooleanExtra("dod",false);
+            boolean trend=intent.getBooleanExtra("trend",false);
             price.setText(price1);
             details.setText(details1);
             gender.setText(gender1);
@@ -81,11 +88,33 @@ public class EditService extends AppCompatActivity {
                 dod_true.setChecked(false);
                 dod_false.setChecked(true);
             }
+            if(trend){
+                trend_true.setChecked(true);
+                trend_false.setChecked(false);
+            }
+            else{
+                trend_true.setChecked(false);
+                trend_false.setChecked(true);
+            }
         }
         else{
             name.setVisibility(View.VISIBLE);
             nameT.setVisibility(View.VISIBLE);
         }
+        trend_true.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                trend_false.setChecked(false);
+                trend_true.setChecked(true);
+            }
+        });
+        trend_false.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                trend_false.setChecked(true);
+                trend_true.setChecked(false);
+            }
+        });
         dod_true.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,7 +140,10 @@ public class EditService extends AppCompatActivity {
                 String gen=gender.getText().toString();
 
                 if(!dod_true.isChecked() && !dod_false.isChecked()){
-                    Toast.makeText(getApplicationContext(),"Please select true or false",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Please select deal of the day true or false",Toast.LENGTH_SHORT).show();
+                }
+                else if(!trend_true.isChecked() && !trend_false.isChecked()){
+                    Toast.makeText(getApplicationContext(),"Please select trending true or false",Toast.LENGTH_SHORT).show();
                 }
                 else if(!gen.equals("male") && !gen.equals("female")){
                     gender.setError("Enter male or female");
@@ -133,12 +165,18 @@ public class EditService extends AppCompatActivity {
 //                }
 
                 else{
-                    boolean dod;
+                    boolean dod,trending;
                     if(dod_true.isChecked()){
                         dod=true;
                     }
                     else{
                         dod=false;
+                    }
+                    if(trend_true.isChecked()){
+                        trending=true;
+                    }
+                    else{
+                        trending=false;
                     }
                     Retrofit retrofit= RetrofitClientInstance.getRetrofitInstance();
                     JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
@@ -147,7 +185,7 @@ public class EditService extends AppCompatActivity {
                         progressDialog.setMessage("Hold on for a moment...");
                         progressDialog.show();
                         progressDialog.setCancelable(false);
-                        Call<Service> call=jsonPlaceHolderApi.addService(new Service(name.getText().toString(),price.getText().toString(),time.getText().toString(),details.getText().toString(),discount.getText().toString(),gender.getText().toString(),type.getText().toString(),dod,null));
+                        Call<Service> call=jsonPlaceHolderApi.addService(new Service(name.getText().toString(),price.getText().toString(),time.getText().toString(),details.getText().toString(),discount.getText().toString(),gender.getText().toString(),type.getText().toString(),dod,null,trending),token);
                         call.enqueue(new Callback<Service>() {
                             @Override
                             public void onResponse(Call<Service> call, Response<Service> response) {
@@ -174,7 +212,7 @@ public class EditService extends AppCompatActivity {
                         progressDialog.setMessage("Hold on for a moment...");
                         progressDialog.show();
                         progressDialog.setCancelable(false);
-                        Call<Service> call=jsonPlaceHolderApi.updateService(new Service(name1,pr,tm,det,dis,gen,ty,dod,id));
+                        Call<Service> call=jsonPlaceHolderApi.updateService(new Service(name1,pr,tm,det,dis,gen,ty,dod,id,trending),token);
                         call.enqueue(new Callback<Service>() {
                             @Override
                             public void onResponse(Call<Service> call, Response<Service> response) {
@@ -191,6 +229,7 @@ public class EditService extends AppCompatActivity {
                                     intent1.putExtra("discount",dis);
                                     intent1.putExtra("name",name1);
                                     intent1.putExtra("id",id);
+                                    intent1.putExtra("trend",trending);
                                     startActivity(intent1);
                                 }
                                 else{

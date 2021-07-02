@@ -19,12 +19,14 @@ public class Service {
     private String type;
     @SerializedName("dod")
     private boolean dod;
+    @SerializedName("trending")
+    private boolean trend;
     @SerializedName("id")
     private String id;
 
 
     public Service(String name, String price, String time, String detail, String discount,
-                   String gender, String type, boolean dod,String id) {
+                   String gender, String type, boolean dod,String id,boolean trend) {
         this.name = name;
         this.price = price;
         this.time = time;
@@ -34,6 +36,11 @@ public class Service {
         this.type = type;
         this.dod = dod;
         this.id=id;
+        this.trend=trend;
+    }
+
+    public boolean isTrend() {
+        return trend;
     }
 
     public String getId() {

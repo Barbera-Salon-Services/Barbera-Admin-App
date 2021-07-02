@@ -1,6 +1,10 @@
 package com.barbera.barberahomesalon.Admin;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,14 +38,15 @@ public class FirebaseAdmin extends AppCompatActivity {
         Button swap = findViewById(R.id.swap);
         Button update = findViewById(R.id.update);
         Button up = findViewById(R.id.update1);
-        Button service=findViewById(R.id.service_button);
+        Button logout =findViewById(R.id.logout_button);
 
-        service.setOnClickListener(new View.OnClickListener() {
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(FirebaseAdmin.this, ServiceActivity.class));
+                logoutfromDevice();
             }
         });
+
 
         up.setOnClickListener(v -> {
             startActivity(new Intent(this,UpdateItemActicity.class));
@@ -103,6 +108,24 @@ public class FirebaseAdmin extends AppCompatActivity {
                         swap(task, finalI,Region);
                     }
                 });
+            }
+        });
+    }
+    private void logoutfromDevice() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(FirebaseAdmin.this);
+        builder.setMessage("Logout From This Device??");
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                BookingsActivity.bookingActivityList.clear();
+                SharedPreferences preferences = getSharedPreferences("Token", MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("token", "no");
+                editor.apply();
+                startActivity(new Intent(FirebaseAdmin.this, LoginActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
             }
         });
     }

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +29,9 @@ public class ViewService extends AppCompatActivity {
     private TextView gender;
     private TextView dod;
     private TextView type;
+    private TextView trending;
     private Button edit,delete;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +48,12 @@ public class ViewService extends AppCompatActivity {
         type=findViewById(R.id.service_type);
         edit=findViewById(R.id.edit_service);
         delete=findViewById(R.id.delete_service);
+        trending=findViewById(R.id.service_trend);
+
+        SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
+        token=preferences.getString("token","no");
 
         Intent intent=getIntent();
-
         name.setText(intent.getStringExtra("name"));
         price.setText(intent.getStringExtra("price"));
         time.setText(intent.getStringExtra("time"));
@@ -55,6 +61,13 @@ public class ViewService extends AppCompatActivity {
         discount.setText(intent.getStringExtra("discount"));
         type.setText(intent.getStringExtra("type"));
         boolean deal=intent.getBooleanExtra("dod",false);
+        boolean trend=intent.getBooleanExtra("trend",false);
+        if(trend){
+            trending.setText("True");
+        }
+        else{
+            trending.setText("False");
+        }
         if(deal){
             dod.setText("True");
         }
@@ -77,11 +90,18 @@ public class ViewService extends AppCompatActivity {
                 String typ=type.getText().toString();
                 String gen=gender.getText().toString();
                 String deal=dod.getText().toString();
+                String trend=trending.getText().toString();
                 if(deal.equals("True")){
                     intent.putExtra("dod",true);
                 }
                 else{
                     intent.putExtra("dod",false);
+                }
+                if(trend.equals("True")){
+                    intent.putExtra("trend",true);
+                }
+                else{
+                    intent.putExtra("trend",false);
                 }
                 intent.putExtra("id",id);
                 intent.putExtra("name",nm);
@@ -104,7 +124,7 @@ public class ViewService extends AppCompatActivity {
                 progressDialog.setMessage("Hold on for a moment...");
                 progressDialog.show();
                 progressDialog.setCancelable(false);
-                Call<Void> call=jsonPlaceHolderApi.deleteService(id);
+                Call<Void> call=jsonPlaceHolderApi.deleteService(id,token);
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

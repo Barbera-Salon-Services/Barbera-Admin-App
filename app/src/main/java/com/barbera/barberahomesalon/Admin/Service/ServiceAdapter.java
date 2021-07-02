@@ -3,6 +3,7 @@ package com.barbera.barberahomesalon.Admin.Service;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
     private List<Service> list;
     private Context activity;
     private int flag;
+    private String token;
 
 
     public ServiceAdapter(List<Service> list, Context activity, int flag) {
@@ -54,6 +56,8 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
         Service service=list.get(position);
         holder.name.setText(service.getName());
         holder.id=service.getId();
+        SharedPreferences preferences=activity.getSharedPreferences("Token",activity.MODE_PRIVATE);
+        token=preferences.getString("token","no");
 
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +68,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
 //                progressDialog.setMessage("Hold on for a moment...");
 //                progressDialog.show();
 //                progressDialog.setCancelable(false);
-                Call<ServiceItem> call=jsonPlaceHolderApi.getService(service.getId());
+                Call<ServiceItem> call=jsonPlaceHolderApi.getService(service.getId(),token);
                 call.enqueue(new Callback<ServiceItem>() {
                     @Override
                     public void onResponse(Call<ServiceItem> call, Response<ServiceItem> response) {
@@ -78,6 +82,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
                             holder.gender=service1.getGender();
                             holder.type=service1.getType();
                             holder.dod=service1.isDod();
+                            holder.trend=service1.isTrend();
                             Intent intent=new Intent(activity,ViewService.class);
                             intent.putExtra("name",holder.name.getText().toString());
                             intent.putExtra("price",holder.price);
@@ -88,6 +93,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
                             intent.putExtra("discount",holder.discount);
                             intent.putExtra("dod",holder.dod);
                             intent.putExtra("id",holder.id);
+                            intent.putExtra("trend",holder.trend);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             //progressDialog.dismiss();
                             activity.startActivity(intent);
@@ -119,7 +125,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
         private CardView item;
         private Button add;
         private String price,details,time,discount,gender,type,id;
-        private boolean dod;
+        private boolean dod,trend;
 
 //        private ImageView del;
         public ServiceHolder(@NonNull View itemView) {

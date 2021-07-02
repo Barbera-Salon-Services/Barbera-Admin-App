@@ -10,23 +10,30 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface JsonPlaceHolderApi {
     @POST("addservice")
-    Call<Service> addService(@Body Service service);
+    Call<Service> addService(@Body Service service,@Header("token") String token);
 
     @DELETE("delservice/{id}")
-    Call<Void> deleteService(@Path("id") String id);
+    Call<Void> deleteService(@Path("id") String id,@Header("token") String token);
 
     @GET("getservbyid/{serviceid}")
-    Call<ServiceItem> getService(@Path("serviceid") String id);
+    Call<ServiceItem> getService(@Path("serviceid") String id,@Header("token") String token);
 
     @GET("getallservname")
-    Call<ServiceList> getAllServices();
+    Call<ServiceList> getAllServices(@Header("token") String token);
 
     @POST("updateservice")
-    Call<Service> updateService(@Body Service service);
+    Call<Service> updateService(@Body Service service,@Header("token") String token);
+
+    @POST("loginphone")
+    Call<Register> getToken(@Body Register register);
+
+    @POST("loginotp")
+    Call<Register> checkOtp(@Body Register register, @Header("token") String token);
 
 }

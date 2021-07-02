@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +33,7 @@ public class ServiceActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private LinearLayoutManager manager;
     private ServiceAdapter adapter;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,9 @@ public class ServiceActivity extends AppCompatActivity {
         serviceList=new ArrayList<>();
         adapter=new ServiceAdapter(serviceList,getApplicationContext(),0);
 
+        SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
+        token=preferences.getString("token","no");
+
         Retrofit retrofit= RetrofitClientInstance.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
         ProgressDialog progressDialog = new ProgressDialog(ServiceActivity.this);
@@ -52,7 +57,7 @@ public class ServiceActivity extends AppCompatActivity {
         progressDialog.show();
         progressDialog.setCancelable(false);
 
-        Call<ServiceList> call=jsonPlaceHolderApi.getAllServices();
+        Call<ServiceList> call=jsonPlaceHolderApi.getAllServices(token);
         call.enqueue(new Callback<ServiceList>() {
             @Override
             public void onResponse(Call<ServiceList> call, Response<ServiceList> response) {
@@ -60,7 +65,7 @@ public class ServiceActivity extends AppCompatActivity {
                     ServiceList serviceList1=response.body();
                     List<Service> serviceList2=serviceList1.getServiceList();
                     for(Service service:serviceList2){
-                        serviceList.add(new Service(service.getName(),null,null,null,null,null,null,false,service.getId()));
+                        serviceList.add(new Service(service.getName(),null,null,null,null,null,null,false,service.getId(),false));
                     }
                     recyclerView.setLayoutManager(manager);
                     recyclerView.setAdapter(adapter);
