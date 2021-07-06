@@ -43,7 +43,31 @@ public class FirebaseAdmin extends AppCompatActivity {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logoutfromDevice();
+                Toast.makeText(FirebaseAdmin.this,"Clicked",Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(FirebaseAdmin.this);
+                builder.setMessage("Logout From This Device??")
+                        .setCancelable(false)
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @SuppressLint("ResourceAsColor")
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(FirebaseAdmin.this,"In listener",Toast.LENGTH_SHORT).show();
+                        SharedPreferences preferences = getSharedPreferences("Token", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("token", "no");
+                        editor.apply();
+                        startActivity(new Intent(FirebaseAdmin.this, LoginActivity.class));
+                        overridePendingTransition(0, 0);
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
 
@@ -108,24 +132,6 @@ public class FirebaseAdmin extends AppCompatActivity {
                         swap(task, finalI,Region);
                     }
                 });
-            }
-        });
-    }
-    private void logoutfromDevice() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(FirebaseAdmin.this);
-        builder.setMessage("Logout From This Device??");
-        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @SuppressLint("ResourceAsColor")
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-//                BookingsActivity.bookingActivityList.clear();
-                SharedPreferences preferences = getSharedPreferences("Token", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("token", "no");
-                editor.apply();
-                startActivity(new Intent(FirebaseAdmin.this, LoginActivity.class));
-                overridePendingTransition(0, 0);
-                finish();
             }
         });
     }

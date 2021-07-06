@@ -1,15 +1,12 @@
 package com.barbera.barberahomesalon.Admin.Service;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
 import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
-import com.barbera.barberahomesalon.Admin.Network.Service;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import java.util.List;
@@ -28,8 +24,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-
-import static androidx.core.content.ContextCompat.startActivity;
 
 public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceHolder> {
     private List<Service> list;
@@ -77,8 +71,9 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
                             Service service1=serviceItem.getService();
                             holder.price=service1.getPrice();
                             holder.time=service1.getTime();
+                            holder.subtype=service1.getSubtype();
                             holder.details=service1.getDetail();
-                            holder.discount=service1.getDiscount();
+                            holder.discount=service1.getCutprice();
                             holder.gender=service1.getGender();
                             holder.type=service1.getType();
                             holder.dod=service1.isDod();
@@ -88,6 +83,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
                             intent.putExtra("price",holder.price);
                             intent.putExtra("time",holder.time);
                             intent.putExtra("type",holder.type);
+                            intent.putExtra("subtype",holder.subtype);
                             intent.putExtra("gender",holder.gender);
                             intent.putExtra("details",holder.details);
                             intent.putExtra("discount",holder.discount);
@@ -124,7 +120,7 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
         private TextView name;
         private CardView item;
         private Button add;
-        private String price,details,time,discount,gender,type,id;
+        private String price,details,time,discount,gender,type,id,subtype;
         private boolean dod,trend;
 
 //        private ImageView del;

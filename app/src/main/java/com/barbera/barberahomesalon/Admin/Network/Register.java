@@ -12,10 +12,14 @@ public class Register {
     @SerializedName("otp")
     private String otp;
 
-    public Register(String phone, String token, String otp) {
+    @SerializedName("role")
+    private String role;
+
+    public Register(String phone, String token, String otp,String role) {
         this.phone = phone;
         this.token = token;
         this.otp = otp;
+        this.role=role;
     }
 
     public String getOtp() {
@@ -28,5 +32,9 @@ public class Register {
 
     public String getPhone() {
         return phone;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

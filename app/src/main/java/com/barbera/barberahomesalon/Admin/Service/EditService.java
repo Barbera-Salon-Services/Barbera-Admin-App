@@ -1,12 +1,23 @@
 package com.barbera.barberahomesalon.Admin.Service;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.FileUtils;
+import android.provider.MediaStore;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,13 +26,22 @@ import android.widget.Toast;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
 import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
-import com.barbera.barberahomesalon.Admin.Network.Service;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.BitSet;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.http.Multipart;
 
 public class EditService extends AppCompatActivity {
     private EditText price;
@@ -32,10 +52,13 @@ public class EditService extends AppCompatActivity {
     private CheckBox dod_true,dod_false;
     private CheckBox trend_true,trend_false;
     private EditText type;
+    private EditText subtype;
     private EditText name;
-    private TextView nameT;
-    private Button save;
-    private String name1,id,token;
+    private TextView nameT,imagePath;
+    private Button save,imageChooser;
+    private String name1,id,token,encodedImage,mime;
+    private Uri filePath;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +78,17 @@ public class EditService extends AppCompatActivity {
         name=findViewById(R.id.edit_name);
         trend_false=findViewById(R.id.trending_false);
         trend_true=findViewById(R.id.trending_true);
+        subtype=findViewById(R.id.edit_subtype);
+        imageChooser=findViewById(R.id.image_chooser);
+        imagePath=findViewById(R.id.image_url);
+
+        requestStoragePermission();
+        imageChooser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFileChooser();
+            }
+        });
 
         SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
         token=preferences.getString("token","no");
@@ -71,6 +105,7 @@ public class EditService extends AppCompatActivity {
             String time1=intent.getStringExtra("time");
             String gender1=intent.getStringExtra("gender");
             String type1=intent.getStringExtra("type");
+            String subtype1=intent.getStringExtra("subtype");
             String discount1=intent.getStringExtra("discount");
             boolean dod1=intent.getBooleanExtra("dod",false);
             boolean trend=intent.getBooleanExtra("trend",false);
@@ -80,6 +115,7 @@ public class EditService extends AppCompatActivity {
             time.setText(time1);
             discount.setText(discount1);
             type.setText(type1);
+            subtype.setText(subtype1);
             if(dod1){
                 dod_true.setChecked(true);
                 dod_false.setChecked(false);
@@ -133,6 +169,7 @@ public class EditService extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String pr=price.getText().toString();
+                String sub=subtype.getText().toString();
                 String det=details.getText().toString();
                 String tm=time.getText().toString();
                 String ty=type.getText().toString();
@@ -145,14 +182,14 @@ public class EditService extends AppCompatActivity {
                 else if(!trend_true.isChecked() && !trend_false.isChecked()){
                     Toast.makeText(getApplicationContext(),"Please select trending true or false",Toast.LENGTH_SHORT).show();
                 }
-                else if(!gen.equals("male") && !gen.equals("female")){
+                else if(!gen.equals("male") && !gen.equals("female") && !gen.equals("none")){
                     gender.setError("Enter male or female");
                 }
                 else if(pr.isEmpty()){
                     price.setError("Enter price");
                 }
                 else if(dis.isEmpty()){
-                    price.setError("Enter discounted price");
+                    price.setError("Enter cut price");
                 }
                 else if(tm.isEmpty()){
                     price.setError("Enter time");
@@ -185,10 +222,19 @@ public class EditService extends AppCompatActivity {
                         progressDialog.setMessage("Hold on for a moment...");
                         progressDialog.show();
                         progressDialog.setCancelable(false);
-                        Call<Service> call=jsonPlaceHolderApi.addService(new Service(name.getText().toString(),price.getText().toString(),time.getText().toString(),details.getText().toString(),discount.getText().toString(),gender.getText().toString(),type.getText().toString(),dod,null,trending),token);
-                        call.enqueue(new Callback<Service>() {
+                        File file= new File(filePath.getPath());
+//                        okhttp3.RequestBody requestBody= RequestBody.create(MediaType.parse("multipart/form-data"),file);
+
+                        RequestBody requestBody=RequestBody.create(MediaType.parse("image/*"),bitmap.toString());
+                        MultipartBody.Part img=MultipartBody.Part.createFormData("image",file.getName(),requestBody);
+                        //RequestBody image = RequestBody.create(MediaType.parse("text/plain"), bitmap.toString());
+//                        new Service(name.getText().toString(),price.getText().toString(),time.getText().toString(),
+//                                details.getText().toString(),discount.getText().toString(),gender.getText().toString(),type.getText().toString()
+//                                ,dod,null,trending,subtype.getText().toString(),null)
+                        Call<Void> call=jsonPlaceHolderApi.addService(img,"Bearer "+token);
+                        call.enqueue(new Callback<Void>() {
                             @Override
-                            public void onResponse(Call<Service> call, Response<Service> response) {
+                            public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==200){
                                     progressDialog.dismiss();
                                     Toast.makeText(EditService.this,"Service added",Toast.LENGTH_SHORT).show();
@@ -201,9 +247,10 @@ public class EditService extends AppCompatActivity {
                             }
 
                             @Override
-                            public void onFailure(Call<Service> call, Throwable t) {
+                            public void onFailure(Call<Void> call, Throwable t) {
                                 progressDialog.dismiss();
                                 Toast.makeText(EditService.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditService.this,"On failure",Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -212,7 +259,7 @@ public class EditService extends AppCompatActivity {
                         progressDialog.setMessage("Hold on for a moment...");
                         progressDialog.show();
                         progressDialog.setCancelable(false);
-                        Call<Service> call=jsonPlaceHolderApi.updateService(new Service(name1,pr,tm,det,dis,gen,ty,dod,id,trending),token);
+                        Call<Service> call=jsonPlaceHolderApi.updateService(new Service(name1,pr,tm,det,dis,gen,ty,dod,id,trending,sub,bitmap.toString()),"Bearer "+token);
                         call.enqueue(new Callback<Service>() {
                             @Override
                             public void onResponse(Call<Service> call, Response<Service> response) {
@@ -224,6 +271,7 @@ public class EditService extends AppCompatActivity {
                                     intent1.putExtra("details",det);
                                     intent1.putExtra("time",tm);
                                     intent1.putExtra("type",ty);
+                                    intent1.putExtra("subtype",sub);
                                     intent1.putExtra("gender",gen);
                                     intent1.putExtra("dod",dod);
                                     intent1.putExtra("discount",dis);
@@ -245,11 +293,61 @@ public class EditService extends AppCompatActivity {
                             }
                         });
                     }
-
-
                 }
             }
         });
 
+    }
+    private void requestStoragePermission(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED){
+            return;
+        }
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},211);
+    }
+    private void showFileChooser(){
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 311);
+//        Intent intent= new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(Intent.createChooser(intent,"Select Image"),311);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==311 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            filePath=data.getData();
+            Toast.makeText(getApplicationContext(),"Inside onActivity",Toast.LENGTH_SHORT).show();
+
+            try {
+                bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Toast.makeText(getApplicationContext(),bitmap.toString(),Toast.LENGTH_SHORT).show();
+//            ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+//            bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
+//            byte[] bytes=byteArrayOutputStream.toByteArray();
+//            //MimeTypeMap mimeTypeMap=MimeTypeMap.getSingleton();
+//            //mime=mimeTypeMap.getExtensionFromMimeType(getContentResolver().getType(filePath));
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                encodedImage= Base64.getEncoder().encodeToString(bytes);
+//            }
+//            Toast.makeText(getApplicationContext(),encodedImage,Toast.LENGTH_SHORT).show();
+            //imagePath.setText(encodedImage);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==211){
+            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this,"Permission granted",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

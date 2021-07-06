@@ -47,10 +47,12 @@ public class LoginActivity extends AppCompatActivity {
         get_code.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                get_code.setEnabled(false);
-                progressBar.setVisibility(View.VISIBLE);
-                sendToastmsg("Sending OTP");
-                sendfVerificationCode();
+                if(verifyPhoneNumber()) {
+                    get_code.setEnabled(false);
+                    progressBar.setVisibility(View.VISIBLE);
+                    sendToastmsg("Sending OTP");
+                    sendfVerificationCode();
+                }
             }
         });
         continue_to_signup.setOnClickListener(new View.OnClickListener() {
@@ -74,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
     private void verifyUser() {
         Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi2 = retrofit.create(JsonPlaceHolderApi.class);
-        Call<Register> call = jsonPlaceHolderApi2.checkOtp(new Register(null,null, veri_code.getText().toString()),tempToken);
+        Call<Register> call = jsonPlaceHolderApi2.checkOtp(new Register(null,null, veri_code.getText().toString(),"admin"),"Bearer "+tempToken);
         call.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {
@@ -122,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
     private void sendfVerificationCode() {
         Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi2 = retrofit.create(JsonPlaceHolderApi.class);
-        Call<Register> call = jsonPlaceHolderApi2.getToken(new Register(phoneNumber.getText().toString(), null, null));
+        Call<Register> call = jsonPlaceHolderApi2.getToken(new Register(phoneNumber.getText().toString(), null,null, null));
         call.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {
@@ -148,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
-        String isRegistered = preferences.getString("token","no");
+        String isRegistered = preferences.getString("token","haha");
         if(!isRegistered.equals("no")){
             startActivity(new Intent(this, MainActivity.class));
         }

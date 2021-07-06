@@ -29,6 +29,7 @@ public class ViewService extends AppCompatActivity {
     private TextView gender;
     private TextView dod;
     private TextView type;
+    private TextView subtype;
     private TextView trending;
     private Button edit,delete;
     private String token;
@@ -46,6 +47,7 @@ public class ViewService extends AppCompatActivity {
         gender=findViewById(R.id.service_gender);
         dod=findViewById(R.id.service_dod);
         type=findViewById(R.id.service_type);
+        subtype=findViewById(R.id.service_subtype);
         edit=findViewById(R.id.edit_service);
         delete=findViewById(R.id.delete_service);
         trending=findViewById(R.id.service_trend);
@@ -60,6 +62,7 @@ public class ViewService extends AppCompatActivity {
         details.setText(intent.getStringExtra("details"));
         discount.setText(intent.getStringExtra("discount"));
         type.setText(intent.getStringExtra("type"));
+        subtype.setText(intent.getStringExtra("subtype"));
         boolean deal=intent.getBooleanExtra("dod",false);
         boolean trend=intent.getBooleanExtra("trend",false);
         if(trend){
@@ -111,7 +114,7 @@ public class ViewService extends AppCompatActivity {
                 intent.putExtra("gender",gen);
                 intent.putExtra("type",typ);
                 intent.putExtra("discount",dis);
-
+                intent.putExtra("subtype",subtype.getText().toString());
                 startActivity(intent);
             }
         });
@@ -124,7 +127,7 @@ public class ViewService extends AppCompatActivity {
                 progressDialog.setMessage("Hold on for a moment...");
                 progressDialog.show();
                 progressDialog.setCancelable(false);
-                Call<Void> call=jsonPlaceHolderApi.deleteService(id,token);
+                Call<Void> call=jsonPlaceHolderApi.deleteService(id,"Bearer "+token);
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

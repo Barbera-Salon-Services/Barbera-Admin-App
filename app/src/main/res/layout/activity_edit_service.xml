@@ -5,7 +5,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-    >
+
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/edit_name"
+            android:hint="Enter service name"
             android:visibility="gone"
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
@@ -65,6 +66,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:hint="Enter price"
             android:textSize="20sp"/>
 
     </LinearLayout>
@@ -75,7 +77,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Discounted Price: "
+            android:text="Cut Price: "
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
@@ -86,6 +88,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/edit_discount"
             android:layout_marginBottom="20dp"
+            android:hint="Enter cut price"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:textSize="20sp"/>
@@ -111,6 +114,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:hint="Enter service time"
             android:textSize="20sp"/>
 
     </LinearLayout>
@@ -134,6 +138,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:hint="Enter details"
             android:textSize="20sp"/>
 
     </LinearLayout>
@@ -157,6 +162,7 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:hint="Enter male/female/none"
             android:textSize="20sp"/>
     </LinearLayout>
     <LinearLayout
@@ -166,7 +172,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Service Type(Eg.Haircut): "
+            android:text="Service Type: "
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
@@ -179,6 +185,30 @@
             android:layout_marginBottom="20dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:hint="Eg.Haircut"
+            android:textSize="20sp"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SubType: "
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:textSize="20dp"
+            />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_subtype"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:hint="Eg.Milk waxing"
             android:textSize="20sp"/>
     </LinearLayout>
     <LinearLayout
@@ -236,6 +266,25 @@
             android:textSize="20sp"
             android:id="@+id/trending_false"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:id="@+id/image_chooser"
+        android:text="Choose Image"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_margin="20dp"
+            android:id="@+id/image_url"/>
+
     </LinearLayout>
         <Button
             android:layout_width="wrap_content"

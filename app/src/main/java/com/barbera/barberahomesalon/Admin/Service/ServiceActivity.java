@@ -15,8 +15,6 @@ import android.widget.Toast;
 import com.barbera.barberahomesalon.Admin.MainActivity;
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
 import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
-import com.barbera.barberahomesalon.Admin.Network.Service;
-import com.google.gson.annotations.SerializedName;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class ServiceActivity extends AppCompatActivity {
         progressDialog.show();
         progressDialog.setCancelable(false);
 
-        Call<ServiceList> call=jsonPlaceHolderApi.getAllServices(token);
+        Call<ServiceList> call=jsonPlaceHolderApi.getAllServices("Bearer "+token);
         call.enqueue(new Callback<ServiceList>() {
             @Override
             public void onResponse(Call<ServiceList> call, Response<ServiceList> response) {
@@ -65,7 +63,7 @@ public class ServiceActivity extends AppCompatActivity {
                     ServiceList serviceList1=response.body();
                     List<Service> serviceList2=serviceList1.getServiceList();
                     for(Service service:serviceList2){
-                        serviceList.add(new Service(service.getName(),null,null,null,null,null,null,false,service.getId(),false));
+                        serviceList.add(new Service(service.getName(),null,null,null,null,null,null,false,service.getId(),false,null,null));
                     }
                     recyclerView.setLayoutManager(manager);
                     recyclerView.setAdapter(adapter);
