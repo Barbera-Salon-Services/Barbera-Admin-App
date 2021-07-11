@@ -3,16 +3,14 @@ package com.barbera.barberahomesalon.Admin.Network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.concurrent.TimeUnit;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClientInstance {
+public class RetrofitClientInstanceCart {
     private static Retrofit retrofit;
-    private static final String BASE_URL = "https://ndk29oo1v5.execute-api.ap-south-1.amazonaws.com/Prod/";
+    private static final String BASE_URL = "https://cw5yb7094d.execute-api.ap-south-1.amazonaws.com/Prod/";
 
     public static Retrofit getRetrofitInstance() {
         Gson gson = new GsonBuilder().serializeNulls().create();

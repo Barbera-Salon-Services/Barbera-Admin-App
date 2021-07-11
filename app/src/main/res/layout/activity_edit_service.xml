@@ -67,6 +67,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:hint="Enter price"
+            android:inputType="number"
             android:textSize="20sp"/>
 
     </LinearLayout>
@@ -89,6 +90,7 @@
             android:id="@+id/edit_discount"
             android:layout_marginBottom="20dp"
             android:hint="Enter cut price"
+            android:inputType="number"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:textSize="20sp"/>
@@ -115,6 +117,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:hint="Enter service time"
+            android:inputType="number"
             android:textSize="20sp"/>
 
     </LinearLayout>

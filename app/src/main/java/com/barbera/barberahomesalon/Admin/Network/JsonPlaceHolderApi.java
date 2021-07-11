@@ -19,11 +19,17 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface JsonPlaceHolderApi {
-    @Multipart
-    @POST("addservice")
-    Call<Void> addService(@Part MultipartBody.Part file, @Header("Authorization") String token);
+//    @Multipart
+//    @POST("addservice")
+//    Call<Void> addService(@Part MultipartBody.Part file, @Header("Authorization") String token);
+//    @Part("name") RequestBody name,@Part("price") RequestBody price,
+//    @Part("time") RequestBody time,@Part("cutprice") RequestBody cutprice,@Part("gender") RequestBody gender,@Part("details") RequestBody det,
+//    @Part("type") RequestBody type,@Part("subtype") RequestBody subtype,@Part("dod") RequestBody dod,@Part("trending") RequestBody trend,
+//    @Part("id") RequestBody id,@Part("image") RequestBody image
 
-    @DELETE("delservice/{id}")
+    @POST("addservice")
+    Call<Void> addService(@Body Service service,@Header("Authorization") String token);
+    @POST("delservice/{id}")
     Call<Void> deleteService(@Path("id") String id,@Header("Authorization") String token);
 
     @GET("getservbyid/{serviceid}")

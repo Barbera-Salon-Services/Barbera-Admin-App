@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
-import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import retrofit2.Call;
@@ -121,7 +121,7 @@ public class ViewService extends AppCompatActivity {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Retrofit retrofit=RetrofitClientInstance.getRetrofitInstance();
+                Retrofit retrofit= RetrofitClientInstanceService.getRetrofitInstance();
                 JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
                 ProgressDialog progressDialog = new ProgressDialog(ViewService.this);
                 progressDialog.setMessage("Hold on for a moment...");

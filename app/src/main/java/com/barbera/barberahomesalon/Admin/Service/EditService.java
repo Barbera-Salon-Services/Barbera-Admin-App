@@ -14,10 +14,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,14 +23,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
-import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
+import com.barbera.barberahomesalon.Admin.util.FilePath;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.BitSet;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -41,7 +44,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.http.Multipart;
 
 public class EditService extends AppCompatActivity {
     private EditText price;
@@ -59,6 +61,8 @@ public class EditService extends AppCompatActivity {
     private String name1,id,token,encodedImage,mime;
     private Uri filePath;
     private Bitmap bitmap;
+    private File file;
+    private int flag=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,7 @@ public class EditService extends AppCompatActivity {
         subtype=findViewById(R.id.edit_subtype);
         imageChooser=findViewById(R.id.image_chooser);
         imagePath=findViewById(R.id.image_url);
+        flag=0;
 
         requestStoragePermission();
         imageChooser.setOnClickListener(new View.OnClickListener() {
@@ -168,13 +173,6 @@ public class EditService extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String pr=price.getText().toString();
-                String sub=subtype.getText().toString();
-                String det=details.getText().toString();
-                String tm=time.getText().toString();
-                String ty=type.getText().toString();
-                String dis=discount.getText().toString();
-                String gen=gender.getText().toString();
 
                 if(!dod_true.isChecked() && !dod_false.isChecked()){
                     Toast.makeText(getApplicationContext(),"Please select deal of the day true or false",Toast.LENGTH_SHORT).show();
@@ -182,19 +180,19 @@ public class EditService extends AppCompatActivity {
                 else if(!trend_true.isChecked() && !trend_false.isChecked()){
                     Toast.makeText(getApplicationContext(),"Please select trending true or false",Toast.LENGTH_SHORT).show();
                 }
-                else if(!gen.equals("male") && !gen.equals("female") && !gen.equals("none")){
-                    gender.setError("Enter male or female");
+                else if(!gender.getText().toString().equals("male") && !gender.getText().toString().equals("female") && !gender.getText().toString().equals("none")){
+                    gender.setError("Enter male or female or none");
                 }
-                else if(pr.isEmpty()){
+                else if(price.getText().toString().isEmpty()){
                     price.setError("Enter price");
                 }
-                else if(dis.isEmpty()){
+                else if(discount.getText().toString().isEmpty()){
                     price.setError("Enter cut price");
                 }
-                else if(tm.isEmpty()){
+                else if(time.getText().toString().isEmpty()){
                     price.setError("Enter time");
                 }
-                else if(ty.isEmpty()){
+                else if(type.getText().toString().isEmpty()){
                     price.setError("Enter type of service");
                 }
 //                else if(det.isEmpty()){
@@ -202,6 +200,14 @@ public class EditService extends AppCompatActivity {
 //                }
 
                 else{
+                    int pr=Integer.parseInt(price.getText().toString());
+                    String sub=subtype.getText().toString();
+                    String det=details.getText().toString();
+                    int tm=Integer.parseInt(time.getText().toString());
+                    String ty=type.getText().toString();
+                    int dis=Integer.parseInt(discount.getText().toString());
+                    String gen=gender.getText().toString();
+                    String nm=name.getText().toString();
                     boolean dod,trending;
                     if(dod_true.isChecked()){
                         dod=true;
@@ -215,23 +221,42 @@ public class EditService extends AppCompatActivity {
                     else{
                         trending=false;
                     }
-                    Retrofit retrofit= RetrofitClientInstance.getRetrofitInstance();
+                    Retrofit retrofit= RetrofitClientInstanceService.getRetrofitInstance();
                     JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
                     if(add.equals("yes")){
                         ProgressDialog progressDialog = new ProgressDialog(EditService.this);
                         progressDialog.setMessage("Hold on for a moment...");
                         progressDialog.show();
                         progressDialog.setCancelable(false);
-                        File file= new File(filePath.getPath());
-//                        okhttp3.RequestBody requestBody= RequestBody.create(MediaType.parse("multipart/form-data"),file);
+                        MultipartBody.Part img;
+//                        if(flag==1){
+//                            File file= new File(filePath.getPath());
+//
+//                        }
+//                        else{
+//                            img=null;
+//                        }
+//                        RequestBody nam=RequestBody.create(MediaType.parse("multipart/form-data"),name.getText().toString());
+//                        RequestBody pri=RequestBody.create(MediaType.parse("multipart/form-data"),price.getText().toString());
+//                        RequestBody tim=RequestBody.create(MediaType.parse("multipart/form-data"),time.getText().toString());
+//                        RequestBody deta=RequestBody.create(MediaType.parse("multipart/form-data"),details.getText().toString());
+//                        RequestBody disc=RequestBody.create(MediaType.parse("multipart/form-data"),discount.getText().toString());
+//                        RequestBody ge=RequestBody.create(MediaType.parse("multipart/form-data"),gender.getText().toString());
+//                        RequestBody typ=RequestBody.create(MediaType.parse("multipart/form-data"),type.getText().toString());
+//                        RequestBody subt=RequestBody.create(MediaType.parse("multipart/form-data"),subtype.getText().toString());
+//                        RequestBody dodd=RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(dod));
+//                        RequestBody tr=RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(trending));
 
-                        RequestBody requestBody=RequestBody.create(MediaType.parse("image/*"),bitmap.toString());
-                        MultipartBody.Part img=MultipartBody.Part.createFormData("image",file.getName(),requestBody);
-                        //RequestBody image = RequestBody.create(MediaType.parse("text/plain"), bitmap.toString());
-//                        new Service(name.getText().toString(),price.getText().toString(),time.getText().toString(),
-//                                details.getText().toString(),discount.getText().toString(),gender.getText().toString(),type.getText().toString()
-//                                ,dod,null,trending,subtype.getText().toString(),null)
-                        Call<Void> call=jsonPlaceHolderApi.addService(img,"Bearer "+token);
+                        String path= FilePath.getPath(getApplicationContext(),filePath);
+                        file=new File(path);
+                        RequestBody requestBody=RequestBody.create(MediaType.parse("image/*"),file);
+                        img=MultipartBody.Part.createFormData("image",file.getName(),requestBody);
+//                        ObjectMapper objectMapper=new ObjectMapper();
+//                        StringBuilder data=new StringBuilder();
+//                        data.append(objectMapper.writeValueAsString());
+//                        ,nam,pri,tim,disc,ge,deta,typ,subt,dodd,tr,null,null
+                        Call<Void> call=jsonPlaceHolderApi.addService(new Service(nm,pr,tm,det,dis,gen,ty,dod,null,trending,sub,encodedImage),"Bearer "+token);
+//                        Call<Void> call=jsonPlaceHolderApi.addService(new Service(nm,pr,tm,det,dis,gen,ty,dod,null,trending,sub,encodedImage),"Bearer "+token);
                         call.enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
@@ -307,33 +332,32 @@ public class EditService extends AppCompatActivity {
     private void showFileChooser(){
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, 311);
-//        Intent intent= new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(Intent.createChooser(intent,"Select Image"),311);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==311 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
-            filePath=data.getData();
-            Toast.makeText(getApplicationContext(),"Inside onActivity",Toast.LENGTH_SHORT).show();
+        if(requestCode==311 && resultCode==RESULT_OK && data!=null && data.getData()!=null) {
+            filePath = data.getData();
+            String path= FilePath.getPath(getApplicationContext(),filePath);
+            file=new File(path);
 
+            byte[] bytes = new byte[(int)file.length()];
             try {
-                bitmap= MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+                buf.read(bytes, 0, bytes.length);
+                buf.close();
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             } catch (IOException e) {
+                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            Toast.makeText(getApplicationContext(),bitmap.toString(),Toast.LENGTH_SHORT).show();
-//            ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-//            bitmap.compress(Bitmap.CompressFormat.JPEG,100,byteArrayOutputStream);
-//            byte[] bytes=byteArrayOutputStream.toByteArray();
-//            //MimeTypeMap mimeTypeMap=MimeTypeMap.getSingleton();
-//            //mime=mimeTypeMap.getExtensionFromMimeType(getContentResolver().getType(filePath));
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                encodedImage= Base64.getEncoder().encodeToString(bytes);
-//            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                encodedImage= Base64.getEncoder().encodeToString(bytes);
+            }
 //            Toast.makeText(getApplicationContext(),encodedImage,Toast.LENGTH_SHORT).show();
             //imagePath.setText(encodedImage);
         }

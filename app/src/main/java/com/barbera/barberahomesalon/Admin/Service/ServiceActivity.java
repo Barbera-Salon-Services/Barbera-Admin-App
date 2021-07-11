@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.barbera.barberahomesalon.Admin.MainActivity;
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
-import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ServiceActivity extends AppCompatActivity {
         SharedPreferences preferences=getSharedPreferences("Token",MODE_PRIVATE);
         token=preferences.getString("token","no");
 
-        Retrofit retrofit= RetrofitClientInstance.getRetrofitInstance();
+        Retrofit retrofit= RetrofitClientInstanceService.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
         ProgressDialog progressDialog = new ProgressDialog(ServiceActivity.this);
         progressDialog.setMessage("Hold on for a moment...");
@@ -63,7 +63,7 @@ public class ServiceActivity extends AppCompatActivity {
                     ServiceList serviceList1=response.body();
                     List<Service> serviceList2=serviceList1.getServiceList();
                     for(Service service:serviceList2){
-                        serviceList.add(new Service(service.getName(),null,null,null,null,null,null,false,service.getId(),false,null,null));
+                        serviceList.add(new Service(service.getName(),0,0,null,0,null,null,false,service.getId(),false,null,null));
                     }
                     recyclerView.setLayoutManager(manager);
                     recyclerView.setAdapter(adapter);

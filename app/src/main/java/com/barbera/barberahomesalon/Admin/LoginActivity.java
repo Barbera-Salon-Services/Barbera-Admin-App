@@ -14,7 +14,8 @@ import android.widget.Toast;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
 import com.barbera.barberahomesalon.Admin.Network.Register;
-import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceUser;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import retrofit2.Call;
@@ -74,9 +75,9 @@ public class LoginActivity extends AppCompatActivity {
         msg.show();
     }
     private void verifyUser() {
-        Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
+        Retrofit retrofit = RetrofitClientInstanceUser.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi2 = retrofit.create(JsonPlaceHolderApi.class);
-        Call<Register> call = jsonPlaceHolderApi2.checkOtp(new Register(null,null, veri_code.getText().toString(),"admin"),"Bearer "+tempToken);
+        Call<Register> call = jsonPlaceHolderApi2.checkOtp(new Register(null,null, veri_code.getText().toString(),"admin",null,null,null),"Bearer "+tempToken);
         call.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {
@@ -122,9 +123,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void sendfVerificationCode() {
-        Retrofit retrofit = RetrofitClientInstance.getRetrofitInstance();
+        Retrofit retrofit = RetrofitClientInstanceUser.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi2 = retrofit.create(JsonPlaceHolderApi.class);
-        Call<Register> call = jsonPlaceHolderApi2.getToken(new Register(phoneNumber.getText().toString(), null,null, null));
+        Call<Register> call = jsonPlaceHolderApi2.getToken(new Register(phoneNumber.getText().toString(), null,null, null,null,null,null));
         call.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {

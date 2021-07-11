@@ -15,7 +15,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
-import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstance;
+import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import java.util.List;
@@ -56,24 +56,24 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ServiceH
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Retrofit retrofit= RetrofitClientInstance.getRetrofitInstance();
+                Retrofit retrofit= RetrofitClientInstanceService.getRetrofitInstance();
                 JsonPlaceHolderApi jsonPlaceHolderApi=retrofit.create(JsonPlaceHolderApi.class);
 //                ProgressDialog progressDialog = new ProgressDialog(activity);
 //                progressDialog.setMessage("Hold on for a moment...");
 //                progressDialog.show();
 //                progressDialog.setCancelable(false);
-                Call<ServiceItem> call=jsonPlaceHolderApi.getService(service.getId(),token);
+                Call<ServiceItem> call=jsonPlaceHolderApi.getService(service.getId(),"Bearer "+token);
                 call.enqueue(new Callback<ServiceItem>() {
                     @Override
                     public void onResponse(Call<ServiceItem> call, Response<ServiceItem> response) {
                         if(response.code()==200){
                             ServiceItem serviceItem=response.body();
                             Service service1=serviceItem.getService();
-                            holder.price=service1.getPrice();
-                            holder.time=service1.getTime();
+                            holder.price="Rs "+service1.getPrice();
+                            holder.time=service1.getTime()+"min";
                             holder.subtype=service1.getSubtype();
                             holder.details=service1.getDetail();
-                            holder.discount=service1.getCutprice();
+                            holder.discount="Rs "+service1.getCutprice();
                             holder.gender=service1.getGender();
                             holder.type=service1.getType();
                             holder.dod=service1.isDod();
