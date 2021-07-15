@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -16,6 +17,8 @@ import com.barbera.barberahomesalon.Admin.Network.JsonPlaceHolderApi;
 import com.barbera.barberahomesalon.Admin.Network.Register;
 import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceService;
 import com.barbera.barberahomesalon.Admin.Network.RetrofitClientInstanceUser;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.pubnub.kaushik.realtimetaxiandroiddemo.R;
 
 import retrofit2.Call;
@@ -125,16 +128,33 @@ public class LoginActivity extends AppCompatActivity {
     private void sendfVerificationCode() {
         Retrofit retrofit = RetrofitClientInstanceUser.getRetrofitInstance();
         JsonPlaceHolderApi jsonPlaceHolderApi2 = retrofit.create(JsonPlaceHolderApi.class);
+        FirebaseMessaging.getInstance().subscribeToTopic(phoneNumber.getText().toString()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+
+            }
+        });
         Call<Register> call = jsonPlaceHolderApi2.getToken(new Register(phoneNumber.getText().toString(), null,null, null,null,null,null));
         call.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {
                 if (response.code() == 200) {
                     Register register = response.body();
-                    tempToken = register.getToken();
-                    progressBar.setVisibility(View.INVISIBLE);
-                    veri_code.setVisibility(View.VISIBLE);
-                    continue_to_signup.setVisibility(View.VISIBLE);
+                    final Runnable runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            SharedPreferences sharedPreferences=getSharedPreferences("Notification",MODE_PRIVATE);
+                            tempToken = register.getToken();
+                            progressBar.setVisibility(View.INVISIBLE);
+                            veri_code.setVisibility(View.VISIBLE);
+                            //Toast.makeText(getApplicationContext(),sharedPreferences.getString("notif",""),Toast.LENGTH_SHORT).show();
+                            veri_code.setText(sharedPreferences.getString("notif",""));
+                            continue_to_signup.setVisibility(View.VISIBLE);
+                        }
+                    };
+                    final Handler h = new Handler();
+                    h.removeCallbacks(runnable);
+                    h.postDelayed(runnable, 2000);
                 } else {
                     Toast.makeText(getApplicationContext(), "Request not sent", Toast.LENGTH_SHORT).show();
                 }

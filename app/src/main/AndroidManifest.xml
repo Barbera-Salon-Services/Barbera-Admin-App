@@ -52,6 +52,14 @@
         <activity
             android:name="com.barbera.barberahomesalon.Admin.PassengerActivity"
             tools:ignore="Instantiatable" />
+        <service android:name="com.barbera.barberahomesalon.Admin.NotificationService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
